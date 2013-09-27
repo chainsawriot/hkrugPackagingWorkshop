@@ -9,3 +9,8 @@ Please prepare:
 3. Install the following packages: devtools, roxygen2, testthat
 
 We will package the two R files: weasel and monkey, into an R package.
+
+References for the weasel program:
+
+* [Dawkin's Weasel](http://en.wikipedia.org/wiki/Weasel_program)
+* [Ultimate Boeing 747 Gambit](http://en.wikipedia.org/wiki/Ultimate_Boeing_747_gambit)
