@@ -24,8 +24,9 @@ naturalSelection <- function(offsprings, target) {
   return(list(mostFittedOffspring, fitnessScoring(mostFittedOffspring, target)))
 }
 evolve <- function(parent, numOffspring, rateMutate, charset, target, fitnessScore=0, Gen=1, maxGen=1000) {
-  if (fitnessScore == 1 | Gen ==maxGen) {
+  if (fitnessScore == 1 | Gen > maxGen) {
     cat(c("Final: ", parent, " No. of generations:  ", Gen-1, "\n"), sep="")
+    return(list(finalFitness=fitnessScore, numGen=Gen-1))
   } else {
     offsprings <- reproduce(parent, numOffspring, rateMutate, charset)
     outcome <- naturalSelection(offsprings, target)
@@ -44,7 +45,7 @@ evolution <- function(origin=" ", target="METHINKS IT IS LIKE A WEASEL", numOffS
     }
     targetVector <- unlist(strsplit(toupper(target), ""))
     originVector <- unlist(strsplit(toupper(origin), ""))
-    evolve(originVector, numOffSpring, rateMutate, charset, targetVector, maxGen=maxGen)
+    return(evolve(originVector, numOffSpring, rateMutate, charset, targetVector, maxGen=maxGen))
 }
 
 # producing less offspring
