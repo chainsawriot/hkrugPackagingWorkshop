@@ -44,7 +44,7 @@ evolution <- function(origin=" ", target="METHINKS IT IS LIKE A WEASEL", numOffS
     }
     targetVector <- unlist(strsplit(toupper(target), ""))
     originVector <- unlist(strsplit(toupper(origin), ""))
-    evolve(originVector, numOffSpring, rateMutate, charset, targetVector)
+    evolve(originVector, numOffSpring, rateMutate, charset, targetVector, maxGen=maxGen)
 }
 
 # producing less offspring
