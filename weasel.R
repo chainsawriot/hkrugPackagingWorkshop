@@ -26,7 +26,7 @@ naturalSelection <- function(offsprings, target) {
 evolve <- function(parent, numOffspring, rateMutate, charset, target, fitnessScore=0, Gen=1, maxGen=1000) {
   if (fitnessScore == 1 | Gen > maxGen) {
     cat(c("Final: ", parent, " No. of generations:  ", Gen-1, "\n"), sep="")
-    return(list(finalFitness=fitnessScore, numGen=Gen-1))
+    return(c(finalFitness=fitnessScore, numGen=Gen-1))
   } else {
     offsprings <- reproduce(parent, numOffspring, rateMutate, charset)
     outcome <- naturalSelection(offsprings, target)
@@ -46,6 +46,15 @@ evolution <- function(origin=" ", target="METHINKS IT IS LIKE A WEASEL", numOffS
     targetVector <- unlist(strsplit(toupper(target), ""))
     originVector <- unlist(strsplit(toupper(origin), ""))
     return(evolve(originVector, numOffSpring, rateMutate, charset, targetVector, maxGen=maxGen))
+}
+
+require(ggplot2)
+require(plyr)
+
+experiment <- function(mutationRates=seq(0.0, 0.2, 0.02)) {
+  res <- ldply(mutationRates, .fun=function(x) { evolution(rateMutate=x) })
+  res <- cbind(res, mutationRates = mutationRates)
+  ggplot(res, aes(x=mutationRate, y=finalFitness)) + geom_line()
 }
 
 # producing less offspring

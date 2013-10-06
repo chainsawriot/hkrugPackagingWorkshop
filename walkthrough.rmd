@@ -1,0 +1,327 @@
+## Background knowledge: R package / library
+
+### not so precise definitions
+
+A package is a collection of R functions, objects, compiled-code and data in a well defined format.
+
+A library is a directory where R packages are stored
+
+* Function: .libPaths()
+* R_LIBS in [startup files](http://stat.ethz.ch/R-manual/R-devel/library/base/html/Startup.html) e.g. .Renviron / .RProfile
+
+### Using R packages
+
+To load a package from your library into the current session
+
+* library()
+* require()
+
+Check the session info with
+
+```{r sessionInfo}
+library(stringr)
+### can do with tgz file of a package
+### library("~/string.tgz")
+sessionInfo()
+```
+
+
+The difference between library() and require()
+
+* echo in require() by default
+     * require(stringr, quietly=TRUE)
+* The actual difference. Try:
+
+```{r difflibreq, echo=TRUE}
+sucess1 <- library(MASS)
+sucess2 <- require(MASS)
+sucess1 # loaded packages in this session
+sucess2 # boolean for success loading
+```
+
+Unload a package from the current session
+
+* detach(package:MASS)
+
+Installation of packages
+
+* install.packages(devtools) ### from CRAN
+* install.packages("~/devtools.tgz") ### from local file
+* R CMD build --binary ~/devtools.tgz
+* R CMD install ~/devtools.tgz
+
+Uninstall
+
+* remove.packages(fortune)
+* R CMD REMOVE fortune
+
+
+### Structure of an R package
+
+tgz file = tar.gz (file compression)
+
+```
+./mypkg
+|-- COPYING
+|-- DESCRIPTION
+|-- INDEX
+|-- R/
+|   |-- call_c.r
+|   |-- call_f.r
+|   `-- zzz.r
+|-- README
+|-- demo/
+|   |-- 00Index
+|   |-- RcallC.R
+|   `-- RcallF.R
+|-- man/
+|   |-- test.c.Rd
+|   `-- test.f.Rd
+`-- src/
+    |-- call_c.c
+    `-- call_f.f
+```
+
+Absolute essential:
+
+* R/
+* DESCRIPTION file
+
+Preferred
+
+* man/
+* NAMESPACE file
+
+Optional
+
+* data/
+* inst/
+* demo/
+* tests/
+* src/
+* exec/
+* po/
+* NEWS file
+* README
+* INDEX
+
+## R package development
+
+### Styles
+
+#### Oldskool style: [Writing R Extesions](http://cran.r-project.org/doc/manuals/R-exts.html)
+
+DIY from scratch, Write documentation with Latex, etc.
+
+#### Hadley ecosystem style: [Advanced R Programming](http://adv-r.had.co.nz/#package-development)
+
+Automate all the tedious tasks with the devtools and related packages.
+
+### Scope of this workshop
+
+To package R files with R functions into an R package with documentation and tests using the Hadley ecosystem style.
+
+Not cover
+
+* /data, /po, /exec...
+* packaging S3, S4, R5 objects
+* packaging C / Fortran / Java code
+
+### Development lifecycle
+
+### create a package skeleton
+
+#### require(devtools)
+
+#### create("Dawkins)
+
+Content created      | Purpose
+---------------------|-----------------------------------------------------
+R/Dawkins-package.r  | package documentation, namespace control
+DESCRIPTION file     | metadata about the package
+man/                 | documentation. In the Hadley Style: auto-generation
+
+### Put weasel.R and monkey.R into Dawkins/R/
+
+### Try to load all the functions in Dawkins/R/
+
+#### load_all("./Dawkins")
+
+With error messages complain the empty DESCRIPTION
+
+### Edit the DESCRIPTION for the first time
+
+NO BLANK LINE in the DESCRIPTION file!
+
+Title: A package for Richard Dawkins' theory of gene centric view of evolution
+
+Authors: youname <youremail@youremail.com>
+
+Description: Functions to demostrate the difference between 
+
+Junkyard Tornado and accumulative evolution
+
+License: GPL-2
+
+Add: Maintainer: yourname <yourname@yournam.com>
+
+We will handle the problem of dependence later.
+
+### Create a NAMESPACE for your package
+
+every (good) package should have its own namespace.
+
+The concept of namespace.
+
+e.g. 
+
+* require(MASS)
+* MASS::glm.nb
+
+You are calling the glm.nb function from the MASS namespace
+
+External functions within the package namespace- for user to use without the packagename::function notation.
+
+e.g.
+
+* require(MASS)
+* glm.nb ### because glm.nb is available from the external
+
+Internal functions - can only be use within the package's namespace
+
+Considerations for the NAMESPACE
+
+* Which function should be available for the user as an external function?
+      * You need to document all the external functions.
+* Which package are the dependence?
+
+For the Dawkins package:
+
+* hurricane, evolution and experiment should be available as external functions, all the rest are helper functions.
+* The dependence for Dawkins: ggplot2, plyr
+
+### handling the dependence
+
+R will install all dependence for you. Should specify in the DESCRIPTION.
+
+The difference between Depends, Imports, Suggests
+
+* Depends: works like require()
+* Imports: make the external functions for the imported package usable in your package's namespace
+* Suggests: Not absolute require but enhance the functionality
+
+Use Imports whenever possible.
+
+### Make ggplot2 and plyr as "Imports"
+
+Edit the DESCRIPTION with the Imports field
+
+Edit the package documentation file.
+
+"#'"" is the special notation for use with the Roxygen2.
+
+* @import ggplot2
+* @import plyr
+* can use @importFrom plyr ldply
+    * if you only need a small number of function from a dependence.
+
+run document("./Dawkins")
+
+Have a look at the NAMESPACE and DESCRIPTION
+
+remove the require() lines in the weasel.R file
+
+Restart R session to make sure DESCRIPTION and NAMESPACE work
+
+* require(devtools)
+* load_all("./Dawkins")
+
+Dependence seems to be working
+
+### Documentation and make some functions external.
+
+Using Roxygen2 to document.
+
+Just above the evolution() function.
+
+```{r}
+
+#' Weasel program
+#' 
+#' This function demostrates the process of evolution as suggested by Dawkins.
+#' 
+#' @param origin the origin string
+#' @param target the target string
+#' @param numOffSpring Number of springs to reproduce
+#' @param rateMutate Mutation Rate
+#' @param maxGen Maximum number of generations
+#' @examples
+#' evolution()
+#' @export
+
+```
+
+Take a look at man/ and NAMESPACE
+
+Do the same for experiment and hurricane
+
+```{r}
+
+
+#' To find the optimal mutation rate
+#' 
+#' This function determines the optimal mutation rate for the evolution function
+#' 
+#' @param mutationRates A vector of mutation rate
+#' @examples
+#' experiment()
+#' @seealso evolution
+#' @export
+
+
+#' The junkyard tornado simulation
+#' 
+#' This function demostrates the spontaneous generation of gene combination in the junkyard tornado metaphor.
+#' 
+#' @param origin the origin string
+#' @param target the target string
+#' @param maxGen Maximum number of generations
+#' @examples
+#' hurricane()
+#' @seealso evolution
+#' @export
+
+```
+
+As well as the package documentation file
+
+```{r}
+#' Dawkins
+#' 
+#' Doawkins provides functions to demostrate the concepts of gene centric view of evolution.
+#'
+```
+
+
+### Try to build the package!
+
+R CMD build ./Dawkins
+
+### And check for problems
+
+R CMD check ./Dawkins_0.1.tar.gz
+
+### And install!
+
+R CMD install ./Dawkins_0.1.tar.gz
+
+### And use it!
+
+* require(Dawkins)
+* evolution()
+* But you cannot use evolve()
+
+### Congrats!
+
+### Unit testing
+
