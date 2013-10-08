@@ -20,8 +20,6 @@ Check the session info with
 
 ```{r sessionInfo}
 library(stringr)
-### can do with tgz file of a package
-### library("~/string.tgz")
 sessionInfo()
 ```
 
@@ -240,7 +238,7 @@ Dependence seems to be working
 
 ### Documentation and make some functions external.
 
-Using Roxygen2 to document.
+Using Roxygen2 to document. (Please check the original documentation)
 
 Just above the evolution() function.
 
@@ -323,5 +321,33 @@ R CMD install ./Dawkins_0.1.tar.gz
 
 ### Congrats!
 
+You have created your first package.
+
 ### Unit testing
 
+Unit testing with test that (check the HKRUG #1 video demo)
+
+all tests should be stored in inst/tests
+
+and put a file called "run-all.R" inside tests/ with the content being
+
+unit testing will be conducted when R CMD check.
+
+```
+library(testthat)
+test_package("Dawkins")
+```
+
+### Brief intro to data
+
+put the data into the data directory and document it in the package documentation under NULL if needed.
+
+### Other useful techniques
+
+* include a .Rbuildignore in your package directoty to exclude files during R CMD build
+
+```
+.git
+.gitignore
+.Rbuildignore
+```
