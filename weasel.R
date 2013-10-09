@@ -54,7 +54,7 @@ require(plyr)
 experiment <- function(mutationRates=seq(0.0, 0.2, 0.02)) {
   res <- ldply(mutationRates, .fun=function(x) { evolution(rateMutate=x) })
   res <- cbind(res, mutationRates = mutationRates)
-  ggplot(res, aes(x=mutationRate, y=finalFitness)) + geom_line()
+  ggplot(res, aes(x=mutationRates, y=finalFitness)) + geom_line()
 }
 
 # producing less offspring
